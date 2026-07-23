@@ -42,11 +42,6 @@
             border: 1px solid var(--border-color);
         }
 
-        .icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
         h1 { 
             margin-top: 0;
             color: var(--heading-color); 
@@ -90,7 +85,6 @@
     </div>
 
     <script>
-        // Sync theme with system / saved preference
         const savedTheme = localStorage.getItem('theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 

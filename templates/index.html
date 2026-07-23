@@ -79,12 +79,10 @@
         .theme-svg {
             width: 22px;
             height: 22px;
-            /* Tells the SVG path to inherit text color */
             fill: var(--text-color); 
             transition: fill 0.3s ease;
         }
 
-        /* Inverts SVG color in Dark Mode so dark icons stay visible */
         body.dark-mode .theme-svg {
             filter: invert(1);
         }
@@ -146,7 +144,8 @@
 
     <div class="card">
         <form method="POST" style="display:inline;">
-            <button type="submit" name="action" value="reset" class="btn btn-danger">Reset Solver</button>
+            <input type="hidden" name="action" value="reset">
+            <button type="submit" class="btn btn-danger">Reset Solver</button>
         </form>
         <p><strong>Candidates remaining:</strong> {{ candidates_count }}</p>
         {% if possible_words %}
@@ -188,6 +187,7 @@
         </div>
 
         <form method="POST" id="wordle-form">
+            <input type="hidden" name="action" value="submit">
             <div class="form-group">
                 <div class="tile-container">
                     <input type="text" class="wordle-tile-input color-b" data-index="0" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
@@ -201,14 +201,15 @@
             <input type="hidden" id="guess" name="guess" value="">
             <input type="hidden" id="feedback" name="feedback" value="bbbbb">
 
-            <button type="submit" name="action" value="submit" class="btn btn-primary">Submit Turn</button>
+            <button type="submit" class="btn btn-primary">Submit Turn</button>
         </form>
     </div>
     {% else %}
     <div class="card gameover-card">
         <h2>Game Over</h2>
         <form method="POST">
-            <button type="submit" name="action" value="reset" class="btn btn-primary" style="max-width: 200px; margin: 10px auto; display: block;">Play Another Round</button>
+            <input type="hidden" name="action" value="reset">
+            <button type="submit" class="btn btn-primary" style="max-width: 200px; margin: 10px auto; display: block;">Play Another Round</button>
         </form>
     </div>
     {% endif %}
@@ -225,7 +226,6 @@
             }
         }
 
-        // Initialize Theme from localStorage or System Preference
         const savedTheme = localStorage.getItem('theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -319,20 +319,20 @@
             } else {
                 compileFormData();
             }
-        });
-    </script>
-    <script>
-    // Prevent double/spam submissions on all forms
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function() {
-            const buttons = this.querySelectorAll('button[type="submit"]');
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                btn.innerText = "Processing...";
+
+            // Prevent double/spam submissions on all forms safely
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    const buttons = this.querySelectorAll('button[type="submit"]');
+                    setTimeout(() => {
+                        buttons.forEach(btn => {
+                            btn.disabled = true;
+                            btn.innerText = "Processing...";
+                        });
+                    }, 0);
+                });
             });
         });
-    });
-</script>
-
+    </script>
 </body>
 </html>

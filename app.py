@@ -18,7 +18,6 @@ limiter = Limiter(
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    # Pass the retry-after duration if available from Flask-Limiter
     return render_template("429.html"), 429
 
 # Load data into memory once when server starts
@@ -97,9 +96,5 @@ def index():
     )
 
 if __name__ == "__main__":
-    # Use environment variable or default to False for production
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() in ["true", "1"]
     app.run(debug=debug_mode)
-
-from flask import render_template
-
