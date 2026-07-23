@@ -1,18 +1,32 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
-# Import logic directly from your backend file
 from solver_backend import load_data, filter_candidates, best_guesses, parse_feedback_string
 
 app = Flask(__name__)
-# Secret key is required to use Flask sessions securely
 app.secret_key = os.environ.get("SECRET_KEY", "fallback_dev_key_wordle_123")
+
+# Initialize Rate Limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    # Pass the retry-after duration if available from Flask-Limiter
+    return render_template("429.html"), 429
 
 # Load data into memory once when server starts
 ALL_WORDS, FREQUENCIES = load_data("frequencies.csv")
 OPENER = "crane"
 
 @app.route("/", methods=["GET", "POST"])
+@limiter.limit("5 per second") # Limit rapid button spam to 5 requests/sec max
 def index():
     # 1. Initialize history if missing
     if "history" not in session:
@@ -86,3 +100,6 @@ if __name__ == "__main__":
     # Use environment variable or default to False for production
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() in ["true", "1"]
     app.run(debug=debug_mode)
+
+from flask import render_template
+

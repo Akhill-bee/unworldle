@@ -321,5 +321,18 @@
             }
         });
     </script>
+    <script>
+    // Prevent double/spam submissions on all forms
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const buttons = this.querySelectorAll('button[type="submit"]');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.innerText = "Processing...";
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
