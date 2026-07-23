@@ -5,12 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle Solver</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background-color: #f4f4f9; color: #333; }
-        h1 { text-align: center; color: #2e7d32; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        :root {
+            /* Light Mode (Default) */
+            --bg-color: #f4f4f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --subtext-color: #666666;
+            --border-color: #e0e0e0;
+            --badge-bg: #e0f2f1;
+            --badge-text: #004d40;
+            --heading-color: #2e7d32;
+            --gameover-bg: #e8f5e9;
+            --gameover-border: #2e7d32;
+        }
+
+        body.dark-mode {
+            /* Dark Mode Theme */
+            --bg-color: #121213;
+            --card-bg: #1a1a1b;
+            --text-color: #ffffff;
+            --subtext-color: #a0a0a0;
+            --border-color: #3a3a3c;
+            --badge-bg: #1c3b38;
+            --badge-text: #80cbd0;
+            --heading-color: #6aaa64;
+            --gameover-bg: #1b2e1e;
+            --gameover-border: #6aaa64;
+        }
+
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 { 
+            margin: 0; 
+            color: var(--heading-color); 
+        }
+
+        /* Circular Theme Toggle Button */
+        .theme-toggle-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.08);
+        }
+
+        /* SVG Icon Controls */
+        .theme-svg {
+            width: 22px;
+            height: 22px;
+            /* Tells the SVG path to inherit text color */
+            fill: var(--text-color); 
+            transition: fill 0.3s ease;
+        }
+
+        /* Inverts SVG color in Dark Mode so dark icons stay visible */
+        body.dark-mode .theme-svg {
+            filter: invert(1);
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; 
+            border: 1px solid var(--border-color);
+        }
+
         .error { color: #c62828; background: #ffebee; padding: 10px; border-radius: 4px; font-weight: bold; text-align: center;}
         .suggestions { display: flex; gap: 10px; justify-content: space-around; margin: 15px 0; }
-        .badge { background: #e0f2f1; color: #004d40; padding: 10px 20px; border-radius: 4px; font-weight: bold; font-size: 1.1em; }
+        .badge { background: var(--badge-bg); color: var(--badge-text); padding: 10px 20px; border-radius: 4px; font-weight: bold; font-size: 1.1em; }
         .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1em; }
         .btn-primary { background: #2e7d32; color: white; margin-top: 10px; }
         .btn-danger { background: #c62828; color: white; float: right; width: auto; font-size: 0.9em; padding: 8px 12px; }
@@ -34,12 +124,25 @@
             width: 40px; height: 40px; font-size: 1.3em; font-weight: bold; display: flex;
             align-items: center; justify-content: center; border-radius: 4px; text-transform: uppercase;
         }
-        .attempt-label { font-size: 0.9em; font-weight: bold; color: #666; width: 80px; }
+        .attempt-label { font-size: 0.9em; font-weight: bold; color: var(--subtext-color); width: 80px; }
+        
+        .gameover-card {
+            text-align: center; 
+            background: var(--gameover-bg); 
+            border: 2px solid var(--gameover-border);
+        }
     </style>
 </head>
 <body>
 
-    <h1>Unwordle</h1>
+    <div class="header-container">
+        <h1>Unwordle</h1>
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+            <svg class="theme-svg" viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.82.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3z"/>
+            </svg>
+        </button>
+    </div>
 
     <div class="card">
         <form method="POST" style="display:inline;">
@@ -86,8 +189,6 @@
 
         <form method="POST" id="wordle-form">
             <div class="form-group">
-
-                
                 <div class="tile-container">
                     <input type="text" class="wordle-tile-input color-b" data-index="0" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
                     <input type="text" class="wordle-tile-input color-b" data-index="1" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
@@ -104,7 +205,7 @@
         </form>
     </div>
     {% else %}
-    <div class="card" style="text-align: center; background: #e8f5e9; border: 2px solid #2e7d32;">
+    <div class="card gameover-card">
         <h2>Game Over</h2>
         <form method="POST">
             <button type="submit" name="action" value="reset" class="btn btn-primary" style="max-width: 200px; margin: 10px auto; display: block;">Play Another Round</button>
@@ -113,6 +214,35 @@
     {% endif %}
 
     <script>
+        // --- Dark Mode Switch Script ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        // Initialize Theme from localStorage or System Preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            applyTheme('dark');
+        } else {
+            applyTheme('light');
+        }
+
+        themeToggleBtn?.addEventListener('click', () => {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const newTheme = isDarkMode ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // --- Wordle Form Mechanics ---
         const inputs = document.querySelectorAll('.wordle-tile-input');
         const guessHidden = document.getElementById('guess');
         const feedbackHidden = document.getElementById('feedback');
