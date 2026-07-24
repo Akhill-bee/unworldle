@@ -5,43 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle Solver</title>
     
+    <link rel="stylesheet" href="https://home.akhilbee.dev/theme.css">
     <script src="https://home.akhilbee.dev/footer.js" defer></script>
 
     <style>
-        :root {
-            /* Light Mode (Default) */
-            --bg-color: #f4f4f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --subtext-color: #666666;
-            --border-color: #e0e0e0;
-            --badge-bg: #e0f2f1;
-            --badge-text: #004d40;
-            --heading-color: #2e7d32;
-            --gameover-bg: #e8f5e9;
-            --gameover-border: #2e7d32;
-        }
-
-        body.dark-mode {
-            /* Dark Mode Theme */
-            --bg-color: #121213;
-            --card-bg: #1a1a1b;
-            --text-color: #ffffff;
-            --subtext-color: #a0a0a0;
-            --border-color: #3a3a3c;
-            --badge-bg: #1c3b38;
-            --badge-text: #80cbd0;
-            --heading-color: #6aaa64;
-            --gameover-bg: #1b2e1e;
-            --gameover-border: #6aaa64;
-        }
-
         body { 
             font-family: Arial, sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            transition: background-color 0.3s ease, color 0.3s ease;
-            
             /* Flex layout to push footer down */
             display: flex;
             flex-direction: column;
@@ -56,7 +25,7 @@
             margin: 40px auto;
             padding: 0 20px;
             box-sizing: border-box;
-            flex: 1; /* Pushes the footer to the bottom */
+            flex: 1; /* Pushes footer to the bottom */
         }
 
         .header-container {
@@ -68,7 +37,6 @@
 
         h1 { 
             margin: 0; 
-            color: var(--heading-color); 
         }
 
         /* Circular Theme Toggle Button */
@@ -91,16 +59,11 @@
             transform: scale(1.08);
         }
 
-        /* SVG Icon Controls */
         .theme-svg {
             width: 22px;
             height: 22px;
             fill: var(--text-color); 
             transition: fill 0.3s ease;
-        }
-
-        body.dark-mode .theme-svg {
-            filter: invert(1);
         }
 
         .card { 
@@ -112,12 +75,48 @@
             border: 1px solid var(--border-color);
         }
 
-        .error { color: #c62828; background: #ffebee; padding: 10px; border-radius: 4px; font-weight: bold; text-align: center;}
-        .suggestions { display: flex; gap: 10px; justify-content: space-around; margin: 15px 0; }
-        .badge { background: var(--badge-bg); color: var(--badge-text); padding: 10px 20px; border-radius: 4px; font-weight: bold; font-size: 1.1em; }
-        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1em; }
-        .btn-primary { background: #2e7d32; color: white; margin-top: 10px; }
-        .btn-danger { background: #c62828; color: white; float: right; width: auto; font-size: 0.9em; padding: 8px 12px; }
+        .error { 
+            color: #c62828; 
+            background: #ffebee; 
+            padding: 10px; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            text-align: center;
+        }
+        
+        .suggestions { 
+            display: flex; 
+            gap: 10px; 
+            justify-content: space-around; 
+            margin: 15px 0; 
+            flex-wrap: wrap;
+        }
+        
+        .btn { 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            width: 100%; 
+            font-size: 1.1em; 
+        }
+        
+        .btn-primary { 
+            background: var(--heading-color); 
+            color: #ffffff; 
+            margin-top: 10px; 
+        }
+        
+        .btn-danger { 
+            background: #c62828; 
+            color: white; 
+            float: right; 
+            width: auto; 
+            font-size: 0.9em; 
+            padding: 8px 12px; 
+        }
+
         .form-group { margin-bottom: 15px; text-align: center; }
 
         .tile-container { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
@@ -138,15 +137,14 @@
             width: 40px; height: 40px; font-size: 1.3em; font-weight: bold; display: flex;
             align-items: center; justify-content: center; border-radius: 4px; text-transform: uppercase;
         }
-        .attempt-label { font-size: 0.9em; font-weight: bold; color: var(--subtext-color); width: 80px; }
+        .attempt-label { font-size: 0.9em; font-weight: bold; color: var(--subheading-color); width: 80px; }
         
         .gameover-card {
             text-align: center; 
-            background: var(--gameover-bg); 
-            border: 2px solid var(--gameover-border);
+            background: var(--card-bg); 
+            border: 2px solid var(--border-color);
         }
 
-        /* Footer styling hook */
         akhilbee-footer {
             width: 100%;
             margin-top: auto;
@@ -203,7 +201,7 @@
             <h3>Top Guesses:</h3>
             <div class="suggestions">
                 {% for opt in top_options %}
-                    <div class="badge" data-word="{{ opt }}" onclick="window.fillSuggestedWord(this.dataset.word)" style="cursor: pointer;" title="Click to fill this word">
+                    <div class="tag" data-word="{{ opt }}" onclick="window.fillSuggestedWord(this.dataset.word)" style="cursor: pointer;" title="Click to fill this word">
                         #{{ loop.index }}: {{ opt|upper }}
                     </div>
                 {% endfor %}
@@ -339,14 +337,13 @@
         });
 
         document.addEventListener("DOMContentLoaded", () => {
-            const initialBadge = document.querySelector('.badge');
-            if (initialBadge && initialBadge.dataset.word) {
-                window.fillSuggestedWord(initialBadge.dataset.word);
+            const initialTag = document.querySelector('.tag');
+            if (initialTag && initialTag.dataset.word) {
+                window.fillSuggestedWord(initialTag.dataset.word);
             } else {
                 compileFormData();
             }
 
-            // Prevent double/spam submissions on all forms safely
             document.querySelectorAll('form').forEach(form => {
                 form.addEventListener('submit', function() {
                     const buttons = this.querySelectorAll('button[type="submit"]');

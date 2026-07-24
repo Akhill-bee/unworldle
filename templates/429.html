@@ -5,35 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Too Many Requests - Unwordle</title>
 
+    <link rel="stylesheet" href="https://home.akhilbee.dev/theme.css">
     <script src="https://home.akhilbee.dev/footer.js" defer></script>
 
     <style>
-        :root {
-            --bg-color: #f4f4f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --subtext-color: #666666;
-            --border-color: #e0e0e0;
-            --heading-color: #c62828;
-        }
-
-        body.dark-mode {
-            --bg-color: #121213;
-            --card-bg: #1a1a1b;
-            --text-color: #ffffff;
-            --subtext-color: #a0a0a0;
-            --border-color: #3a3a3c;
-            --heading-color: #ef5350;
-        }
-
         body { 
             font-family: Arial, sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
             text-align: center;
-            transition: background-color 0.3s ease, color 0.3s ease;
             
-            /* Flexbox layout to push the footer down */
+            /* Flexbox layout to push footer down */
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -59,12 +39,10 @@
 
         h1 { 
             margin-top: 0;
-            color: var(--heading-color); 
             font-size: 1.8rem;
         }
 
         p {
-            color: var(--subtext-color);
             line-height: 1.5;
             font-size: 1.05rem;
         }
@@ -76,8 +54,8 @@
             cursor: pointer; 
             font-weight: bold; 
             font-size: 1rem;
-            background: #2e7d32; 
-            color: white; 
+            background: var(--heading-color); 
+            color: #ffffff; 
             text-decoration: none;
             display: inline-block;
             margin-top: 15px;
