@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle Solver</title>
+    
+    <script src="https://home.akhilbee.dev/footer.js" defer></script>
+
     <style>
         :root {
             /* Light Mode (Default) */
@@ -35,12 +38,25 @@
 
         body { 
             font-family: Arial, sans-serif; 
-            max-width: 600px; 
-            margin: 40px auto; 
-            padding: 20px; 
             background-color: var(--bg-color); 
             color: var(--text-color); 
             transition: background-color 0.3s ease, color 0.3s ease;
+            
+            /* Flex layout to push footer down */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+            flex: 1; /* Pushes the footer to the bottom */
         }
 
         .header-container {
@@ -129,90 +145,100 @@
             background: var(--gameover-bg); 
             border: 2px solid var(--gameover-border);
         }
+
+        /* Footer styling hook */
+        akhilbee-footer {
+            width: 100%;
+            margin-top: auto;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>Unwordle</h1>
-        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
-            <svg class="theme-svg" viewBox="0 0 24 24" width="24" height="24">
-                <path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.82.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3z"/>
-            </svg>
-        </button>
-    </div>
+    <div class="main-wrapper">
+        <div class="header-container">
+            <h1>Unwordle</h1>
+            <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+                <svg class="theme-svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.82.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3z"/>
+                </svg>
+            </button>
+        </div>
 
-    <div class="card">
-        <form method="POST" style="display:inline;">
-            <input type="hidden" name="action" value="reset">
-            <button type="submit" class="btn btn-danger">Reset Solver</button>
-        </form>
-        <p><strong>Candidates remaining:</strong> {{ candidates_count }}</p>
-        {% if possible_words %}
-            <p><strong>Possible words:</strong> {{ possible_words|join(', ')|upper }}</p>
+        <div class="card">
+            <form method="POST" style="display:inline;">
+                <input type="hidden" name="action" value="reset">
+                <button type="submit" class="btn btn-danger">Reset Solver</button>
+            </form>
+            <p><strong>Candidates remaining:</strong> {{ candidates_count }}</p>
+            {% if possible_words %}
+                <p><strong>Possible words:</strong> {{ possible_words|join(', ')|upper }}</p>
+            {% endif %}
+        </div>
+
+        {% if error %}
+            <p class="error">⚠️ {{ error }}</p>
+        {% endif %}
+
+        {% if history %}
+        <div class="card" style="text-align: center;">
+            <h3 style="margin-top: 0;">Your Progress</h3>
+            <div style="display: inline-block; text-align: left;">
+                {% for turn in history %}
+                    <div class="history-row">
+                        <div class="attempt-label">Turn {{ loop.index }}:</div>
+                        <div class="history-tile color-{{ turn.feedback[0] }}">{{ turn.guess[0] }}</div>
+                        <div class="history-tile color-{{ turn.feedback[1] }}">{{ turn.guess[1] }}</div>
+                        <div class="history-tile color-{{ turn.feedback[2] }}">{{ turn.guess[2] }}</div>
+                        <div class="history-tile color-{{ turn.feedback[3] }}">{{ turn.guess[3] }}</div>
+                        <div class="history-tile color-{{ turn.feedback[4] }}">{{ turn.guess[4] }}</div>
+                    </div>
+                {% endfor %} 
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not game_over %}
+        <div class="card">
+            <h3>Top Guesses:</h3>
+            <div class="suggestions">
+                {% for opt in top_options %}
+                    <div class="badge" data-word="{{ opt }}" onclick="window.fillSuggestedWord(this.dataset.word)" style="cursor: pointer;" title="Click to fill this word">
+                        #{{ loop.index }}: {{ opt|upper }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <form method="POST" id="wordle-form">
+                <input type="hidden" name="action" value="submit">
+                <div class="form-group">
+                    <div class="tile-container">
+                        <input type="text" class="wordle-tile-input color-b" data-index="0" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
+                        <input type="text" class="wordle-tile-input color-b" data-index="1" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
+                        <input type="text" class="wordle-tile-input color-b" data-index="2" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
+                        <input type="text" class="wordle-tile-input color-b" data-index="3" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
+                        <input type="text" class="wordle-tile-input color-b" data-index="4" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
+                    </div>
+                </div>
+
+                <input type="hidden" id="guess" name="guess" value="">
+                <input type="hidden" id="feedback" name="feedback" value="bbbbb">
+
+                <button type="submit" class="btn btn-primary">Submit Turn</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="card gameover-card">
+            <h2>Game Over</h2>
+            <form method="POST">
+                <input type="hidden" name="action" value="reset">
+                <button type="submit" class="btn btn-primary" style="max-width: 200px; margin: 10px auto; display: block;">Play Another Round</button>
+            </form>
+        </div>
         {% endif %}
     </div>
 
-    {% if error %}
-        <p class="error">⚠️ {{ error }}</p>
-    {% endif %}
-
-    {% if history %}
-    <div class="card" style="text-align: center;">
-        <h3 style="margin-top: 0;">Your Progress</h3>
-        <div style="display: inline-block; text-align: left;">
-            {% for turn in history %}
-                <div class="history-row">
-                    <div class="attempt-label">Turn {{ loop.index }}:</div>
-                    <div class="history-tile color-{{ turn.feedback[0] }}">{{ turn.guess[0] }}</div>
-                    <div class="history-tile color-{{ turn.feedback[1] }}">{{ turn.guess[1] }}</div>
-                    <div class="history-tile color-{{ turn.feedback[2] }}">{{ turn.guess[2] }}</div>
-                    <div class="history-tile color-{{ turn.feedback[3] }}">{{ turn.guess[3] }}</div>
-                    <div class="history-tile color-{{ turn.feedback[4] }}">{{ turn.guess[4] }}</div>
-                </div>
-            {% endfor %} 
-        </div>
-    </div>
-    {% endif %}
-
-    {% if not game_over %}
-    <div class="card">
-        <h3>Top Guesses:</h3>
-        <div class="suggestions">
-            {% for opt in top_options %}
-                <div class="badge" data-word="{{ opt }}" onclick="window.fillSuggestedWord(this.dataset.word)" style="cursor: pointer;" title="Click to fill this word">
-                    #{{ loop.index }}: {{ opt|upper }}
-                </div>
-            {% endfor %}
-        </div>
-
-        <form method="POST" id="wordle-form">
-            <input type="hidden" name="action" value="submit">
-            <div class="form-group">
-                <div class="tile-container">
-                    <input type="text" class="wordle-tile-input color-b" data-index="0" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
-                    <input type="text" class="wordle-tile-input color-b" data-index="1" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
-                    <input type="text" class="wordle-tile-input color-b" data-index="2" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
-                    <input type="text" class="wordle-tile-input color-b" data-index="3" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
-                    <input type="text" class="wordle-tile-input color-b" data-index="4" data-state="b" maxlength="1" autocomplete="off" inputmode="text" required>
-                </div>
-            </div>
-
-            <input type="hidden" id="guess" name="guess" value="">
-            <input type="hidden" id="feedback" name="feedback" value="bbbbb">
-
-            <button type="submit" class="btn btn-primary">Submit Turn</button>
-        </form>
-    </div>
-    {% else %}
-    <div class="card gameover-card">
-        <h2>Game Over</h2>
-        <form method="POST">
-            <input type="hidden" name="action" value="reset">
-            <button type="submit" class="btn btn-primary" style="max-width: 200px; margin: 10px auto; display: block;">Play Another Round</button>
-        </form>
-    </div>
-    {% endif %}
+    <akhilbee-footer></akhilbee-footer>
 
     <script>
         // --- Dark Mode Switch Script ---

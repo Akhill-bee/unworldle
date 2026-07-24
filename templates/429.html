@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Too Many Requests - Unwordle</title>
+
+    <script src="https://home.akhilbee.dev/footer.js" defer></script>
+
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -25,13 +28,25 @@
 
         body { 
             font-family: Arial, sans-serif; 
-            max-width: 500px; 
-            margin: 80px auto; 
-            padding: 20px; 
             background-color: var(--bg-color); 
             color: var(--text-color); 
             text-align: center;
             transition: background-color 0.3s ease, color 0.3s ease;
+            
+            /* Flexbox layout to push the footer down */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 500px;
+            margin: auto auto; /* Centers the error card vertically and horizontally */
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .card { 
@@ -72,17 +87,27 @@
         .btn:hover {
             opacity: 0.9;
         }
+
+        /* Forces footer component to span full width and snap to bottom */
+        akhilbee-footer {
+            width: 100%;
+            margin-top: auto;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Hey! Don't do that please</h1>
-        <p>You've submitted too many requests in a short period.</p>
-        <p>Please wait a few seconds before refreshing or trying another guess.</p>
-        
-        <a href="/" class="btn">Try Again</a>
+    <div class="main-wrapper">
+        <div class="card">
+            <h1>Hey! Don't do that please</h1>
+            <p>You've submitted too many requests in a short period.</p>
+            <p>Please wait a few seconds before refreshing or trying another guess.</p>
+            
+            <a href="/" class="btn">Try Again</a>
+        </div>
     </div>
+
+    <akhilbee-footer></akhilbee-footer>
 
     <script>
         const savedTheme = localStorage.getItem('theme');
